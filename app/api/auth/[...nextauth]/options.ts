@@ -35,7 +35,7 @@ export const options: NextAuthOptions = {
         });
 
         if (!user || !user?.hashedPassword) {
-          throw new Error("Invalid credentials");
+          throw new Error("Email does not exist");
         }
 
         const isCorrectPassword = await bcrypt.compare(
@@ -44,7 +44,7 @@ export const options: NextAuthOptions = {
         );
 
         if (!isCorrectPassword) {
-          throw new Error("Invalid credentials");
+          throw new Error("Incorrect password");
         }
 
         return user;

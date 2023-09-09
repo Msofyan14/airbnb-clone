@@ -6,19 +6,22 @@ import { FcGoogle } from "react-icons/fc";
 import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
-import useRegisterModal from "@/hooks/useRegisterModal";
 import Modal from "./Modal";
 import Heading from "@/components/Heading";
 import Input from "../input/Input";
 import toast from "react-hot-toast";
 import Button from "../Button";
 import useLoginModal from "@/hooks/useLoginModal";
+import useRegisterModal from "@/hooks/useRegisterModal";
+import { useRouter } from "next/navigation";
 
-const RegisterModal = () => {
-  const registerModal = useRegisterModal();
+const LoginModal = () => {
   const loginModal = useLoginModal();
+  const registerModal = useRegisterModal();
 
   const [isLoading, setIsloading] = useState(false);
+
+  const router = useRouter();
 
   const {
     register,
@@ -26,46 +29,42 @@ const RegisterModal = () => {
     formState: { errors },
   } = useForm<FieldValues>({
     defaultValues: {
-      name: "",
       email: "",
       password: "",
     },
   });
 
   const onToggle = useCallback(() => {
-    registerModal.onClose();
-    loginModal.onOpen();
-  }, [registerModal, loginModal]);
+    loginModal.onClose();
+    registerModal.onOpen();
+  }, [loginModal, registerModal]);
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setIsloading(true);
 
-    axios
-      .post("/api/register", data)
-      .then(() => {
-        registerModal.onClose();
-      })
-      .catch((error) => {
-        if (error.response) {
-          // Jika respons dari server memiliki status yang dapat diakses
-          if (error.response.status === 400) {
-            toast.error("Email Already Exist");
-          } else {
-            toast.error("An error occurred");
-          }
+    signIn("credentials", {
+      ...data,
+      redirect: false,
+    }).then((callback) => {
+      setIsloading(false);
+
+      if (callback?.ok) {
+        if (callback.error) {
+          toast.error(callback.error); // Menampilkan pesan kesalahan jika ada
         } else {
-          // Jika tidak ada respons dari server (seperti masalah jaringan)
-          toast.error("Network error or server is unreachable");
+          toast.success("Logged in");
+          router.refresh();
+          loginModal.onClose();
         }
-      })
-      .finally(() => {
-        setIsloading(false);
-      });
+      } else {
+        toast.error("Login failed"); // Menampilkan pesan kesalahan jika 'ok' adalah 'false'
+      }
+    });
   };
 
   const bodyContent = (
     <div className="flex flex-col gap-4">
-      <Heading title="Welcome to Airbnb" subtitle="Create an account" />
+      <Heading title="Welcome back" subtitle="Login to your account!" />
 
       <Input
         id="email"
@@ -77,14 +76,6 @@ const RegisterModal = () => {
         required
       />
 
-      <Input
-        id="name"
-        label="Name"
-        disabled={isLoading}
-        register={register}
-        errors={errors}
-        required
-      />
       <Input
         id="password"
         label="Password"
@@ -121,7 +112,7 @@ const RegisterModal = () => {
         "
       >
         <p>
-          Already have an account?
+          First time using Airbnb?
           <span
             onClick={onToggle}
             className="
@@ -141,10 +132,10 @@ const RegisterModal = () => {
   return (
     <Modal
       disabled={isLoading}
-      isOpen={registerModal.isOpen}
-      title="Register"
+      isOpen={loginModal.isOpen}
+      title="Login"
       actionLabel="Continue"
-      onClose={registerModal.onClose}
+      onClose={loginModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
       footer={footerContent}
@@ -152,4 +143,4 @@ const RegisterModal = () => {
   );
 };
 
-export default RegisterModal;
+export default LoginModal;
