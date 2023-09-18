@@ -1,6 +1,6 @@
 "use client";
 
-import Containter from "@/components/Container";
+import Container from "@/components/Container";
 import Heading from "@/components/Heading";
 import ListingCard from "@/components/listings/ListingCard";
 import { SafeReservation, SafeUser } from "@/types";
@@ -9,17 +9,18 @@ import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 
-interface TripsClientProps {
+interface ReservationClietnProps {
   reservations: SafeReservation[];
-  currentUser?: SafeUser | null;
+  currentUser: SafeUser | null;
 }
 
-const TripsClient: React.FC<TripsClientProps> = ({
+const ReservationsClient: React.FC<ReservationClietnProps> = ({
   reservations,
   currentUser,
 }) => {
-  const [deletingId, setDeletingId] = useState("");
   const router = useRouter();
+
+  const [deletingId, setDeletingId] = useState("");
 
   const onCancel = useCallback(
     (id: string) => {
@@ -42,34 +43,36 @@ const TripsClient: React.FC<TripsClientProps> = ({
   );
 
   return (
-    <Containter>
-      <Heading
-        title="Trips"
-        subtitle="Where you've been and where you're going"
-      />
+    <Container>
+      <Heading title="Reservations" subtitle="Booking on your properties" />
       <div
-        className="mt-10 grid grid-cols-1 sm:grid-cols-2 
+        className="
+          mt-10
+          grid 
+          grid-cols-1 
+          sm:grid-cols-2 
           md:grid-cols-3 
           lg:grid-cols-4
           xl:grid-cols-5
           2xl:grid-cols-6
-          gap-8"
+          gap-8
+        "
       >
         {reservations.map((reservation: any) => (
           <ListingCard
             key={reservation.id}
             data={reservation.listing}
             reservation={reservation}
+            actionId={reservation.id}
             onAction={onCancel}
             disabled={deletingId === reservation.id}
-            actionLabel="Cancel Reservations"
-            actionId={reservation.id}
+            actionLabel="Cancel guest reservation"
             currentUser={currentUser}
           />
         ))}
       </div>
-    </Containter>
+    </Container>
   );
 };
 
-export default TripsClient;
+export default ReservationsClient;

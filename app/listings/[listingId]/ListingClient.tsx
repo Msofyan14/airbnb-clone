@@ -7,11 +7,7 @@ import { categories } from "@/components/navbar/Categories";
 import useLoginModal from "@/hooks/useLoginModal";
 import { SafeListing, SafeReservation, SafeUser } from "@/types";
 import axios from "axios";
-import {
-  differenceInCalendarDays,
-  differenceInDays,
-  eachDayOfInterval,
-} from "date-fns";
+import { differenceInDays, eachDayOfInterval } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Range } from "react-date-range";
@@ -73,7 +69,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
       .then(() => {
         toast.success("Listing Reserved");
         setDateRange(initialDateRange);
-
         router.push("/trips");
       })
       .catch(() => {
