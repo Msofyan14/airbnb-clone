@@ -53,7 +53,7 @@ const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange }) => {
         styles={{
           control: (provided) => ({
             ...provided,
-            cursor: "pointer", // Mengatur kursor menjadi pointer
+            cursor: "pointer",
           }),
         }}
       />
